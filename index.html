@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Web Preview</title>
+
+  <style>
+    :root {
+      --bg: #090909;
+      --glass: rgba(255,255,255,.075);
+      --glass-strong: rgba(255,255,255,.11);
+      --border: rgba(255,255,255,.13);
+      --text: #f5f5f5;
+      --muted: #888;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at 50% -20%, #252525 0%, transparent 45%),
+        #090909;
+    }
+
+    /* =========================
+       TOP BAR
+    ========================= */
+
+    .topbar {
+      height: 68px;
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 24px;
+
+      background: rgba(20,20,20,.55);
+      backdrop-filter: blur(30px) saturate(120%);
+      -webkit-backdrop-filter: blur(30px) saturate(120%);
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -.2px;
+    }
+
+    .brand-icon {
+      width: 30px;
+      height: 30px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 9px;
+
+      background: linear-gradient(
+        145deg,
+        #ffffff,
+        #8d8d8d
+      );
+
+      color: #111;
+
+      font-size: 13px;
+      font-weight: 800;
+
+      box-shadow:
+        inset 0 1px rgba(255,255,255,.8),
+        0 5px 20px rgba(255,255,255,.08);
+    }
+
+    .controls {
+      display: flex;
+      gap: 7px;
+    }
+
+    button {
+      border: 1px solid rgba(255,255,255,.1);
+
+      background: rgba(255,255,255,.055);
+      color: #eee;
+
+      height: 34px;
+      padding: 0 13px;
+
+      border-radius: 10px;
+
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+
+      cursor: pointer;
+
+      transition:
+        .2s ease;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,.11);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    button:active {
+      transform: scale(.96);
+    }
+
+    /* =========================
+       STAGE
+    ========================= */
+
+    .stage {
+      flex: 1;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      position: relative;
+
+      padding: 35px 20px;
+
+      overflow: hidden;
+    }
+
+    /* ambient glass panels */
+
+    .orb {
+      position: absolute;
+
+      width: 500px;
+      height: 500px;
+
+      border-radius: 50%;
+
+      background: rgba(255,255,255,.025);
+
+      filter: blur(80px);
+
+      pointer-events: none;
+    }
+
+    .orb.one {
+      top: -300px;
+      left: -200px;
+    }
+
+    .orb.two {
+      right: -300px;
+      bottom: -300px;
+      background: rgba(255,255,255,.018);
+    }
+
+    /* =========================
+       PORTRAIT DEVICE
+    ========================= */
+
+    .device {
+      position: relative;
+
+      height: min(82vh, 820px);
+      aspect-ratio: 9 / 19.5;
+
+      padding: 8px;
+
+      border-radius: 42px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #303030,
+          #0b0b0b 35%,
+          #1c1c1c 70%,
+          #050505
+        );
+
+      box-shadow:
+        0 40px 100px rgba(0,0,0,.75),
+        0 0 0 1px rgba(255,255,255,.16),
+        inset 0 1px rgba(255,255,255,.28),
+        inset 0 -2px rgba(0,0,0,.7);
+
+      transition:
+        transform .35s ease,
+        box-shadow .35s ease;
+    }
+
+    .device:hover {
+      transform: translateY(-3px);
+
+      box-shadow:
+        0 50px 120px rgba(0,0,0,.8),
+        0 0 0 1px rgba(255,255,255,.2),
+        inset 0 1px rgba(255,255,255,.3);
+    }
+
+    /* side buttons */
+
+    .device::before {
+      content: "";
+
+      position: absolute;
+
+      left: -3px;
+      top: 150px;
+
+      width: 3px;
+      height: 55px;
+
+      border-radius: 3px 0 0 3px;
+
+      background: #333;
+
+      box-shadow:
+        0 70px #333,
+        0 105px #333;
+    }
+
+    /* screen */
+
+    .screen {
+      width: 100%;
+      height: 100%;
+
+      overflow: hidden;
+
+      border-radius: 35px;
+
+      background: #000;
+
+      position: relative;
+
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+
+      border: 0;
+
+      display: block;
+
+      background: white;
+    }
+
+    /* Dynamic Island */
+
+    .island {
+      position: absolute;
+
+      z-index: 5;
+
+      top: 13px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 92px;
+      height: 27px;
+
+      border-radius: 20px;
+
+      background: #050505;
+
+      box-shadow:
+        0 1px 3px rgba(0,0,0,.8),
+        inset 0 1px rgba(255,255,255,.06);
+
+      pointer-events: none;
+    }
+
+    /* =========================
+       BOTTOM INFO
+    ========================= */
+
+    .footer {
+      position: absolute;
+
+      bottom: 16px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      padding: 8px 13px;
+
+      border: 1px solid rgba(255,255,255,.08);
+
+      border-radius: 100px;
+
+      background: rgba(255,255,255,.045);
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      color: #777;
+
+      font-size: 10px;
+
+      white-space: nowrap;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 600px) {
+
+      .topbar {
+        height: 58px;
+        padding: 0 15px;
+      }
+
+      .brand {
+        font-size: 13px;
+      }
+
+      .brand-icon {
+        width: 27px;
+        height: 27px;
+        border-radius: 8px;
+      }
+
+      .controls button {
+        width: 34px;
+        padding: 0;
+        font-size: 0;
+      }
+
+      .controls button::first-letter {
+        font-size: 14px;
+      }
+
+      .stage {
+        padding: 18px 10px;
+      }
+
+      .device {
+        height: min(82vh, 760px);
+
+        border-radius: 36px;
+        padding: 7px;
+      }
+
+      .screen {
+        border-radius: 30px;
+      }
+
+      .island {
+        width: 80px;
+        height: 24px;
+      }
+
+      .footer {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="brand-icon">W</div>
+      <span>Web Preview</span>
+    </div>
+
+    <div class="controls">
+      <button onclick="reloadPage()">↻ Reload</button>
+      <button onclick="fullscreen()">⛶ Fullscreen</button>
+    </div>
+
+  </header>
+
+
+  <main class="stage">
+
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+
+    <div class="device" id="device">
+
+      <div class="screen">
+
+        <div class="island"></div>
+
+        <!-- GANTI URL DI SINI -->
+        <iframe
+          id="webFrame"
+          src="https://noww-nu.vercel.app/"
+          allow="fullscreen"
+          loading="eager">
+        </iframe>
+
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Live Web Preview · Portrait 9:19.5
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const frame = document.getElementById("webFrame");
+    const device = document.getElementById("device");
+
+    function reloadPage() {
+      frame.src = frame.src;
+    }
+
+    function fullscreen() {
+      if (device.requestFullscreen) {
+        device.requestFullscreen();
+      }
+    }
+
+  </script>
+
+</body>
+</html>
